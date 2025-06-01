@@ -6,11 +6,8 @@ import { AppService } from '../app.service';
 
 @Injectable()
 export class UserService extends AppService<User> {
-  private users: User[];
-
   constructor() {
     super();
-    this.users = [];
   }
 
   create(createUserDto: CreateUserDto): User {

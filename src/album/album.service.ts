@@ -4,10 +4,14 @@ import { Album } from './entities/album.entity';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { TrackService } from '../track/track.service';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class AlbumService extends AppService<Album> {
-  constructor(private readonly trackService: TrackService) {
+  constructor(
+    private readonly trackService: TrackService,
+    private eventEmitter: EventEmitter2,
+  ) {
     super();
   }
 
@@ -37,5 +41,6 @@ export class AlbumService extends AppService<Album> {
     });
 
     super.remove(id);
+    this.eventEmitter.emit('album.deleted', id);
   }
 }

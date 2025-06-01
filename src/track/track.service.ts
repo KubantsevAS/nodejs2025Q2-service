@@ -3,9 +3,14 @@ import { AppService } from '../app.service';
 import { Track } from './entities/track.entity';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class TrackService extends AppService<Track> {
+  constructor(private eventEmitter: EventEmitter2) {
+    super();
+  }
+
   create(createTrackDto: CreateTrackDto): Track {
     return super.create(createTrackDto as Track);
   }
@@ -24,5 +29,6 @@ export class TrackService extends AppService<Track> {
 
   remove(id: string): void {
     super.remove(id);
+    this.eventEmitter.emit('track.deleted', id);
   }
 }

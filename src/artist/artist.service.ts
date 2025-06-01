@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AppService } from '../app.service';
 import { Artist } from './entities/artist.entity';
 import { CreateArtistDto } from './dto/create-artist.dto';
@@ -11,6 +12,7 @@ export class ArtistService extends AppService<Artist> {
   constructor(
     private readonly trackService: TrackService,
     private readonly albumService: AlbumService,
+    private eventEmitter: EventEmitter2,
   ) {
     super();
   }
@@ -34,8 +36,8 @@ export class ArtistService extends AppService<Artist> {
   remove(id: string): void {
     this.setReferenceNull(this.trackService, id);
     this.setReferenceNull(this.albumService, id);
-
     super.remove(id);
+    this.eventEmitter.emit('artist.deleted', id);
   }
 
   private setReferenceNull(service: TrackService | AlbumService, id: string) {
