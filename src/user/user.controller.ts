@@ -5,17 +5,17 @@ import {
   Body,
   Param,
   Delete,
-  BadRequestException,
   ValidationPipe,
   UsePipes,
   Put,
   HttpCode,
   Header,
 } from '@nestjs/common';
-import { validate as isUuid } from 'uuid';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UserResponseDto } from './dto/user-response.dto';
+import { plainToInstance } from 'class-transformer';
 
 @Controller('user')
 export class UserController {
@@ -24,44 +24,51 @@ export class UserController {
   @UsePipes(new ValidationPipe())
   @Post()
   @Header('Content-Type', 'application/json')
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.userService.create(createUserDto);
+  create(@Body() createUserDto: CreateUserDto): UserResponseDto {
+    const user = this.userService.create(createUserDto);
+
+    return plainToInstance(UserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get()
   @Header('Content-Type', 'application/json')
-  findAll() {
-    return this.userService.findAll();
+  findAll(): UserResponseDto[] {
+    const users = this.userService.findAll();
+
+    return plainToInstance(UserResponseDto, users, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Get(':id')
   @Header('Content-Type', 'application/json')
-  findOne(@Param('id') id: string) {
-    if (!isUuid(id)) {
-      throw new BadRequestException('User Id is invalid (not uuid)');
-    }
+  findOne(@Param('id') id: string): UserResponseDto {
+    const user = this.userService.findOne(id);
 
-    return this.userService.findOne(id);
+    return plainToInstance(UserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @UsePipes(new ValidationPipe())
   @Put(':id')
   @Header('Content-Type', 'application/json')
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    if (!isUuid(id)) {
-      throw new BadRequestException('User Id is invalid (not uuid)');
-    }
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ): UserResponseDto {
+    const user = this.userService.updateUserPassword(id, updateUserDto);
 
-    return this.userService.update(id, updateUserDto);
+    return plainToInstance(UserResponseDto, user, {
+      excludeExtraneousValues: true,
+    });
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
-    if (!isUuid(id)) {
-      throw new BadRequestException('User Id is invalid (not uuid)');
-    }
-
+  remove(@Param('id') id: string): void {
     this.userService.remove(id);
   }
 }

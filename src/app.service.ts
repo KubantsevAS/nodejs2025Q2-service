@@ -36,15 +36,7 @@ export class AppService<T extends { id: string }> {
   }
 
   update(id: string, entityDto: Omit<T, 'id'>): T {
-    if (!isUuid(id)) {
-      throw new BadRequestException('Record Id is invalid (not uuid)');
-    }
-
-    const entity = this.entities.find((entity) => entity.id === id);
-
-    if (!entity) {
-      throw new NotFoundException(`Record with id === ${id} doesn't exist`);
-    }
+    const entity = this.findById(id);
 
     for (const key in entityDto) {
       entity[key] = entityDto[key];
@@ -54,15 +46,7 @@ export class AppService<T extends { id: string }> {
   }
 
   remove(id: string): void {
-    if (!isUuid(id)) {
-      throw new BadRequestException('Record Id is invalid (not uuid)');
-    }
-
-    const entity = this.entities.find((entity) => entity.id === id);
-
-    if (!entity) {
-      throw new NotFoundException(`Record with id === ${id} doesn't exist`);
-    }
+    const entity = this.findById(id);
 
     this.entities.splice(this.entities.indexOf(entity), 1);
   }
