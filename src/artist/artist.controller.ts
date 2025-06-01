@@ -38,6 +38,7 @@ export class ArtistController {
     return this.artistService.findOne(id);
   }
 
+  @UsePipes(new ValidationPipe())
   @Put(':id')
   @Header('Content-Type', 'application/json')
   update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
