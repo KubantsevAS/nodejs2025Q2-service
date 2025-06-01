@@ -80,7 +80,7 @@ export class FavsService {
 
     entitiesArray.push(id);
 
-    return 'Added successfully';
+    return { message: 'Added successfully' };
   }
 
   private removeFromFavs(entitiesArray: string[], id: string): void {
@@ -91,7 +91,7 @@ export class FavsService {
     const entityIdx = entitiesArray.indexOf(id);
 
     if (entityIdx === -1) {
-      throw new NotFoundException(`Record was not found`);
+      throw new NotFoundException('Record was not found');
     }
 
     entitiesArray.splice(entityIdx, 1);
