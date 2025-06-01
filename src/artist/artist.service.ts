@@ -1,63 +1,28 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { ArtistDto } from './dto/artist.dto';
+import { Injectable } from '@nestjs/common';
+import { AppService } from '../app.service';
 import { Artist } from './entities/artist.entity';
-import { v4 as uuidV4 } from 'uuid';
+import { CreateArtistDto } from './dto/create-artist.dto';
+import { UpdateArtistDto } from './dto/update-artist.dto';
 
 @Injectable()
-export class ArtistService {
-  private artists: Artist[];
-
-  constructor() {
-    this.artists = [];
+export class ArtistService extends AppService<Artist> {
+  create(createArtistDto: CreateArtistDto): Artist {
+    return super.create(createArtistDto as Artist);
   }
 
-  create({ name, grammy }: ArtistDto) {
-    const artist = {
-      id: uuidV4(),
-      name,
-      grammy,
-    };
-
-    this.artists.push(artist);
-
-    return artist;
+  findAll(): Artist[] {
+    return super.findAll();
   }
 
-  findAll() {
-    return this.artists ?? [];
+  findOne(id: string): Artist {
+    return super.findById(id);
   }
 
-  findOne(id: string) {
-    const artist = this.artists.find((artist) => artist.id === id);
-
-    if (!artist) {
-      throw new NotFoundException(`Record with id === ${id} doesn't exist`);
-    }
-
-    return artist;
+  update(id: string, updateArtistDto: UpdateArtistDto): Artist {
+    return super.update(id, updateArtistDto as Omit<Artist, 'id'>);
   }
 
-  update(id: string, updateArtistDto: ArtistDto) {
-    const artist = this.artists.find((artist) => artist.id === id);
-
-    if (!artist) {
-      throw new NotFoundException(`Record with id === ${id} doesn't exist`);
-    }
-
-    for (const key in updateArtistDto) {
-      artist[key] = updateArtistDto[key];
-    }
-
-    return artist;
-  }
-
-  remove(id: string) {
-    const artist = this.artists.find((artist) => artist.id === id);
-
-    if (!artist) {
-      throw new NotFoundException(`Record with id === ${id} doesn't exist`);
-    }
-
-    this.artists.splice(this.artists.indexOf(artist), 1);
+  remove(id: string): void {
+    super.remove(id);
   }
 }

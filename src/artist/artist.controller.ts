@@ -9,12 +9,11 @@ import {
   ValidationPipe,
   UsePipes,
   Header,
-  BadRequestException,
   HttpCode,
 } from '@nestjs/common';
-import { ArtistDto } from './dto/artist.dto';
 import { ArtistService } from './artist.service';
-import { validate as isUuid } from 'uuid';
+import { CreateArtistDto } from './dto/create-artist.dto';
+import { UpdateArtistDto } from './dto/update-artist.dto';
 
 @Controller('artist')
 export class ArtistController {
@@ -23,7 +22,7 @@ export class ArtistController {
   @UsePipes(new ValidationPipe())
   @Post()
   @Header('Content-Type', 'application/json')
-  create(@Body() createArtistDto: ArtistDto) {
+  create(@Body() createArtistDto: CreateArtistDto) {
     return this.artistService.create(createArtistDto);
   }
 
@@ -36,30 +35,18 @@ export class ArtistController {
   @Get(':id')
   @Header('Content-Type', 'application/json')
   findOne(@Param('id') id: string) {
-    if (!isUuid(id)) {
-      throw new BadRequestException('Artist Id is invalid (not uuid)');
-    }
-
     return this.artistService.findOne(id);
   }
 
   @Put(':id')
   @Header('Content-Type', 'application/json')
-  update(@Param('id') id: string, @Body() updateArtistDto: ArtistDto) {
-    if (!isUuid(id)) {
-      throw new BadRequestException('Artist Id is invalid (not uuid)');
-    }
-
+  update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
     return this.artistService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
   remove(@Param('id') id: string) {
-    if (!isUuid(id)) {
-      throw new BadRequestException('Artist Id is invalid (not uuid)');
-    }
-
     return this.artistService.remove(id);
   }
 }

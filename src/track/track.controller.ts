@@ -7,7 +7,6 @@ import {
   Delete,
   Header,
   Put,
-  BadRequestException,
   UsePipes,
   ValidationPipe,
   HttpCode,
@@ -15,7 +14,6 @@ import {
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
 import { TrackService } from './track.service';
-import { validate as isUuid } from 'uuid';
 
 @Controller('track')
 export class TrackController {
@@ -37,10 +35,6 @@ export class TrackController {
   @Get(':id')
   @Header('Content-Type', 'application/json')
   findOne(@Param('id') id: string) {
-    if (!isUuid(id)) {
-      throw new BadRequestException('Track Id is invalid (not uuid)');
-    }
-
     return this.trackService.findOne(id);
   }
 
@@ -48,20 +42,12 @@ export class TrackController {
   @Put(':id')
   @Header('Content-Type', 'application/json')
   update(@Param('id') id: string, @Body() updateTrackDto: UpdateTrackDto) {
-    if (!isUuid(id)) {
-      throw new BadRequestException('Track Id is invalid (not uuid)');
-    }
-
     return this.trackService.update(id, updateTrackDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
   remove(@Param('id') id: string) {
-    if (!isUuid(id)) {
-      throw new BadRequestException('Track Id is invalid (not uuid)');
-    }
-
     return this.trackService.remove(id);
   }
 }

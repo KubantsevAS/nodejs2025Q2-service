@@ -5,7 +5,6 @@ import {
   Body,
   Param,
   Delete,
-  BadRequestException,
   HttpCode,
   Header,
   Put,
@@ -13,8 +12,8 @@ import {
   ValidationPipe,
 } from '@nestjs/common';
 import { AlbumService } from './album.service';
-import { AlbumDto } from './dto/album.dto';
-import { validate as isUuid } from 'uuid';
+import { CreateAlbumDto } from './dto/create-album.dto';
+import { UpdateAlbumDto } from './dto/update-album.dto';
 
 @Controller('album')
 export class AlbumController {
@@ -23,7 +22,7 @@ export class AlbumController {
   @UsePipes(new ValidationPipe())
   @Post()
   @Header('Content-Type', 'application/json')
-  create(@Body() createAlbumDto: AlbumDto) {
+  create(@Body() createAlbumDto: CreateAlbumDto) {
     return this.albumService.create(createAlbumDto);
   }
 
@@ -36,31 +35,19 @@ export class AlbumController {
   @Get(':id')
   @Header('Content-Type', 'application/json')
   findOne(@Param('id') id: string) {
-    if (!isUuid(id)) {
-      throw new BadRequestException('Track Id is invalid (not uuid)');
-    }
-
     return this.albumService.findOne(id);
   }
 
   @UsePipes(new ValidationPipe())
   @Put(':id')
   @Header('Content-Type', 'application/json')
-  update(@Param('id') id: string, @Body() updateAlbumDto: AlbumDto) {
-    if (!isUuid(id)) {
-      throw new BadRequestException('Track Id is invalid (not uuid)');
-    }
-
+  update(@Param('id') id: string, @Body() updateAlbumDto: UpdateAlbumDto) {
     return this.albumService.update(id, updateAlbumDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
   remove(@Param('id') id: string) {
-    if (!isUuid(id)) {
-      throw new BadRequestException('Track Id is invalid (not uuid)');
-    }
-
     return this.albumService.remove(id);
   }
 }
