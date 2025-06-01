@@ -7,8 +7,3 @@ export class CreateUserDto {
   @IsNotEmpty()
   password: string;
 }
-
-// interface CreateUserDto {
-//     login: string;
-//     password: string;
-//   }
