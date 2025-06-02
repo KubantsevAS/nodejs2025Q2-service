@@ -122,22 +122,10 @@ The documentation includes:
 npm run test
 ```
 
-### Run tests with authentication
-
-```bash
-npm run test:auth
-```
-
 ### Run specific test suite
 
 ```bash
 npm run test -- <path-to-suite>
-```
-
-### Run specific test suite with authentication
-
-```bash
-npm run test:auth -- <path-to-suite>
 ```
 
 ## Code Quality
@@ -170,10 +158,9 @@ src/
 ├── app.module.ts        # Root module
 ├── app.controller.ts    # Root controller
 ├── app.service.ts       # Root service
-├── auth/               # Authentication module
-├── users/              # Users module
-├── artists/            # Artists module
-├── albums/             # Albums module
-├── tracks/             # Tracks module
-└── favorites/          # Favorites module
+├── user/                # Users module
+├── artist/              # Artists module
+├── album/               # Albums module
+├── track/               # Tracks module
+└── favs/                # Favorites module
 ```
