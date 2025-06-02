@@ -3,8 +3,8 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import * as dotenv from 'dotenv';
 import { SwaggerModule } from '@nestjs/swagger';
+import * as fs from 'fs/promises';
 import * as YAML from 'yaml';
-import * as fs from 'fs';
 import * as path from 'path';
 
 dotenv.config();
@@ -24,7 +24,7 @@ async function bootstrap() {
   );
 
   const apiYamlPath = path.join(__dirname, '..', 'doc', 'api.yaml');
-  const fileContents = fs.readFileSync(apiYamlPath, 'utf8');
+  const fileContents = await fs.readFile(apiYamlPath, 'utf8');
   const swaggerDocument = YAML.parse(fileContents);
 
   SwaggerModule.setup('doc', app, swaggerDocument);
