@@ -7,6 +7,7 @@ import { AlbumModule } from './album/album.module';
 import { TrackModule } from './track/track.module';
 import { FavsModule } from './favs/favs.module';
 import { UserModule } from './user/user.module';
+import { PrismaClient } from '@prisma/client';
 
 @Module({
   imports: [
@@ -18,6 +19,13 @@ import { UserModule } from './user/user.module';
     UserModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    {
+      provide: PrismaClient,
+      useValue: new PrismaClient(),
+    },
+  ],
+  exports: [PrismaClient],
 })
 export class AppModule {}

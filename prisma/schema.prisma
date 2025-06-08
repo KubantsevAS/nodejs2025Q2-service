@@ -15,11 +15,11 @@ datasource db {
 
 model User {
   id        String   @id @default(uuid())
-  login     String   @unique
+  login     String
   password  String
   version   Int      @default(1)
-  createdAt Int
-  updatedAt Int
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
 
 model Artist {
