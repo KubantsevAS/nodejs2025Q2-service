@@ -1,0 +1,87 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  login     String   @unique
+  password  String
+  version   Int      @default(1)
+  createdAt Int
+  updatedAt Int
+}
+
+model Artist {
+  id      String   @id @default(uuid())
+  name    String
+  grammy  Boolean
+  albums  Album[]
+  tracks  Track[]
+  favs    FavToArtist[]
+}
+
+model Album {
+  id        String   @id @default(uuid())
+  name      String
+  year      Int
+  artistId  String?
+  artist    Artist?  @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  tracks    Track[]
+  favs      FavToAlbum[]
+}
+
+model Track {
+  id        String   @id @default(uuid())
+  name      String
+  duration  Int
+  artistId  String?
+  albumId   String?
+  artist    Artist?  @relation(fields: [artistId], references: [id], onDelete: SetNull)
+  album     Album?   @relation(fields: [albumId], references: [id], onDelete: SetNull)
+  favs      FavToTrack[]
+}
+
+model Fav {
+  id        String   @id @default(uuid())
+  artists   FavToArtist[]
+  albums    FavToAlbum[]
+  tracks    FavToTrack[]
+}
+
+model FavToArtist {
+  favId    String
+  artistId String
+  fav      Fav    @relation(fields: [favId], references: [id], onDelete: Cascade)
+  artist   Artist @relation(fields: [artistId], references: [id], onDelete: Cascade)
+
+  @@id([favId, artistId])
+}
+
+model FavToAlbum {
+  favId   String
+  albumId String
+  fav     Fav   @relation(fields: [favId], references: [id], onDelete: Cascade)
+  album   Album @relation(fields: [albumId], references: [id], onDelete: Cascade)
+
+  @@id([favId, albumId])
+}
+
+model FavToTrack {
+  favId   String
+  trackId String
+  fav     Fav   @relation(fields: [favId], references: [id], onDelete: Cascade)
+  track   Track @relation(fields: [trackId], references: [id], onDelete: Cascade)
+
+  @@id([favId, trackId])
+}
