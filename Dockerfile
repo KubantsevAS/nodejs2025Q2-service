@@ -8,6 +8,8 @@ RUN npm ci
 
 COPY . .
 
+RUN npx prisma generate
+
 RUN npm run build
 
 FROM node:22.14.0-alpine
@@ -17,6 +19,10 @@ WORKDIR /app
 COPY package*.json ./
 
 RUN npm ci --only=production
+
+COPY prisma ./prisma/
+
+RUN npx prisma generate
 
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/doc ./doc

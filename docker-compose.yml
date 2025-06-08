@@ -5,7 +5,11 @@ services:
     ports:
       - "4000:4000"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://postgres:postgres@db:5432/postgres
   db:
     image: postgres:14
     environment:
@@ -17,6 +21,12 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     command: postgres -c 'max_connections=1000'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
 
 volumes:
   postgres_data:
