@@ -16,6 +16,7 @@ services:
     volumes:
       - .:/app
       - /app/node_modules
+      - ./logs:/app/logs
     networks:
       - app-network
 
