@@ -1,39 +1,32 @@
-FROM node:22.14.0-alpine AS builder
+FROM node:22.14.0-alpine AS deps
 
 WORKDIR /app
 
+RUN apk add --no-cache netcat-openbsd wget
+
 COPY package*.json ./
 
-RUN npm ci
+RUN npm install
 
-COPY . .
-
+COPY prisma ./prisma/
 RUN npx prisma generate
-
-RUN npm run build
 
 FROM node:22.14.0-alpine
 
 WORKDIR /app
 
-RUN apk add --no-cache netcat-openbsd
+RUN apk add --no-cache wget netcat-openbsd
 
-COPY package*.json ./
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/package*.json ./
+COPY --from=deps /app/prisma ./prisma
 
-RUN npm ci --only=production
-
-COPY prisma ./prisma/
-
-RUN npx prisma generate
-
-COPY --from=builder /app/dist ./dist
-COPY --from=builder /app/doc ./doc
 COPY migrate.sh ./
-
 RUN chmod +x migrate.sh
 
-ENV PORT=4000
-ENV HOST=0.0.0.0
+ENV PORT=4000 \
+    HOST=0.0.0.0 \
+    NODE_ENV=development
 
 EXPOSE 4000
 

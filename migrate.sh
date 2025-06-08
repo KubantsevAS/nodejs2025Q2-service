@@ -8,4 +8,4 @@ echo "Running migrations..."
 npx prisma migrate deploy
 
 echo "Starting application..."
-exec npm run start:prod 
+exec npm run start:dev 
