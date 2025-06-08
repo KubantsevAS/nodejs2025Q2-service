@@ -1,4 +1,4 @@
-FROM node:22.14.0-alpine AS deps
+FROM node:20.11.1-alpine AS deps
 
 WORKDIR /app
 
@@ -11,7 +11,7 @@ RUN npm install
 COPY prisma ./prisma/
 RUN npx prisma generate
 
-FROM node:22.14.0-alpine
+FROM node:20.11.1-alpine
 
 WORKDIR /app
 

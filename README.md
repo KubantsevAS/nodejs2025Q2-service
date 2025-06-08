@@ -86,7 +86,7 @@ A Home Library Service built with NestJS that allows users to manage their music
 ## Prerequisites
 
 - Git - [Download & Install Git](https://git-scm.com/downloads)
-- Node.js (v22.14.0 or higher) - [Download & Install Node.js](https://nodejs.org/en/download/)
+- Node.js (v20.11.1 or higher) - [Download & Install Node.js](https://nodejs.org/en/download/)
 - npm (comes with Node.js)
 - Docker - [Download & Install Docker](https://docs.docker.com/get-docker/)
 - Docker Compose - [Download & Install Docker Compose](https://docs.docker.com/compose/install/)
@@ -139,6 +139,25 @@ docker-compose up -d
 ```
 
 The application will be available at `http://localhost:4000`
+
+### Docker Hub Image
+
+You can pull the latest image directly from Docker Hub:
+
+```bash
+docker pull henry173/nodejs2025q2-service-web:latest
+```
+
+Or use it in your docker-compose.yml:
+```yaml
+services:
+  app:
+    image: henry173/nodejs2025q2-service-web:latest
+    ports:
+      - "4000:4000"
+```
+
+[View on Docker Hub](https://hub.docker.com/r/henry173/nodejs2025q2-service-web)
 
 ### Manual Installation
 
