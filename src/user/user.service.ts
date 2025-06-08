@@ -1,7 +1,7 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+import { User } from '@prisma/client';
 import { AppService } from '../app.service';
 
 @Injectable()
@@ -10,25 +10,30 @@ export class UserService extends AppService<User> {
     super();
   }
 
-  create(createUserDto: CreateUserDto): User {
-    return super.create({
+  protected getModelName(): string {
+    return 'user';
+  }
+
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const userData: Omit<User, 'id'> = {
       ...createUserDto,
       version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    } as User);
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    return super.create(userData);
   }
 
-  findAll(): User[] {
-    return super.findAll();
+  async findAll(): Promise<User[]> {
+    return await super.findAll();
   }
 
-  findOne(id: string): User {
+  async findOne(id: string): Promise<User> {
     return super.findById(id);
   }
 
-  updateUserPassword(id: string, updateUserDto: UpdateUserDto): User {
-    const user = super.findById(id);
+  async updateUserPassword(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+    const user = await this.findById(id);
 
     if (user.password !== updateUserDto.oldPassword) {
       throw new ForbiddenException('Old password is wrong');
@@ -40,15 +45,16 @@ export class UserService extends AppService<User> {
       );
     }
 
-    return super.update(id, {
-      ...user,
+    const updateData: Partial<User> = {
       password: updateUserDto.newPassword,
       version: user.version + 1,
-      updatedAt: Date.now(),
-    } as Omit<User, 'id'>);
+      updatedAt: new Date(),
+    };
+
+    return await this.update(id, updateData);
   }
 
-  remove(id: string): void {
-    super.remove(id);
+  async remove(id: string): Promise<void> {
+    await super.remove(id);
   }
 }

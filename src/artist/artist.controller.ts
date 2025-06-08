@@ -22,32 +22,32 @@ export class ArtistController {
   @UsePipes(new ValidationPipe())
   @Post()
   @Header('Content-Type', 'application/json')
-  create(@Body() createArtistDto: CreateArtistDto) {
-    return this.artistService.create(createArtistDto);
+  async create(@Body() createArtistDto: CreateArtistDto) {
+    return await this.artistService.create(createArtistDto);
   }
 
   @Get()
   @Header('Content-Type', 'application/json')
-  findAll() {
-    return this.artistService.findAll();
+  async findAll() {
+    return await this.artistService.findAll();
   }
 
   @Get(':id')
   @Header('Content-Type', 'application/json')
-  findOne(@Param('id') id: string) {
-    return this.artistService.findOne(id);
+  async findOne(@Param('id') id: string) {
+    return await this.artistService.findOne(id);
   }
 
   @UsePipes(new ValidationPipe())
   @Put(':id')
   @Header('Content-Type', 'application/json')
-  update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
-    return this.artistService.update(id, updateArtistDto);
+  async update(@Param('id') id: string, @Body() updateArtistDto: UpdateArtistDto) {
+    return await this.artistService.update(id, updateArtistDto);
   }
 
   @Delete(':id')
   @HttpCode(204)
-  remove(@Param('id') id: string) {
-    return this.artistService.remove(id);
+  async remove(@Param('id') id: string) {
+    return await this.artistService.remove(id);
   }
 }

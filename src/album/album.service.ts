@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { AppService } from '../app.service';
-import { Album } from './entities/album.entity';
+import { Album } from '@prisma/client';
 import { CreateAlbumDto } from './dto/create-album.dto';
 import { UpdateAlbumDto } from './dto/update-album.dto';
 import { TrackService } from '../track/track.service';
@@ -15,32 +15,36 @@ export class AlbumService extends AppService<Album> {
     super();
   }
 
-  create(createAlbumDto: CreateAlbumDto): Album {
-    return super.create(createAlbumDto as Album);
+  protected getModelName(): string {
+    return 'album';
   }
 
-  findAll(): Album[] {
-    return super.findAll();
+  async create(createAlbumDto: CreateAlbumDto): Promise<Album> {
+    return await super.create(createAlbumDto as Album);
   }
 
-  findOne(id: string): Album {
-    return super.findById(id);
+  async findAll(): Promise<Album[]> {
+    return await super.findAll();
   }
 
-  update(id: string, updateAlbumDto: UpdateAlbumDto): Album {
-    return super.update(id, updateAlbumDto as Omit<Album, 'id'>);
+  async findOne(id: string): Promise<Album> {
+    return await super.findById(id);
   }
 
-  remove(id: string): void {
-    const tracks = this.trackService
-      .findAll()
-      .filter((track) => track.albumId === id);
+  async update(id: string, updateAlbumDto: UpdateAlbumDto): Promise<Album> {
+    return await super.update(id, updateAlbumDto as Omit<Album, 'id'>);
+  }
 
-    tracks.forEach((track) => {
+  async remove(id: string): Promise<void> {
+    const tracks = await this.trackService.findAll()
+
+    const albumTracks = tracks.filter((track) => track.albumId === id);
+
+    albumTracks.forEach((track) => {
       this.trackService.update(track.id, { ...track, albumId: null });
     });
 
-    super.remove(id);
+    await super.remove(id);
     this.eventEmitter.emit('album.deleted', id);
   }
 }

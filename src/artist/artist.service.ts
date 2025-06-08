@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { AppService } from '../app.service';
-import { Artist } from './entities/artist.entity';
+import { PrismaClient, Artist } from '@prisma/client';
 import { CreateArtistDto } from './dto/create-artist.dto';
 import { UpdateArtistDto } from './dto/update-artist.dto';
 import { TrackService } from 'src/track/track.service';
@@ -17,35 +17,39 @@ export class ArtistService extends AppService<Artist> {
     super();
   }
 
-  create(createArtistDto: CreateArtistDto): Artist {
-    return super.create(createArtistDto as Artist);
+  protected getModelName(): string {
+    return 'artist';
   }
 
-  findAll(): Artist[] {
-    return super.findAll();
+  async create(createArtistDto: CreateArtistDto): Promise<Artist> {
+    return await super.create(createArtistDto as Artist);
   }
 
-  findOne(id: string): Artist {
-    return super.findById(id);
+  async findAll(): Promise<Artist[]> {
+    return await super.findAll();
   }
 
-  update(id: string, updateArtistDto: UpdateArtistDto): Artist {
-    return super.update(id, updateArtistDto as Omit<Artist, 'id'>);
+  async findOne(id: string): Promise<Artist> {
+    return await super.findById(id);
   }
 
-  remove(id: string): void {
+  async update(id: string, updateArtistDto: UpdateArtistDto): Promise<Artist> {
+    return await super.update(id, updateArtistDto as Omit<Artist, 'id'>);
+  }
+
+  async remove(id: string): Promise<void> {
     this.setReferenceNull(this.trackService, id);
     this.setReferenceNull(this.albumService, id);
-    super.remove(id);
+    await super.remove(id);
     this.eventEmitter.emit('artist.deleted', id);
   }
 
-  private setReferenceNull(service: TrackService | AlbumService, id: string) {
-    const entities = service
-      .findAll()
-      .filter((entity) => entity.artistId === id);
+  private async setReferenceNull(service: TrackService | AlbumService, id: string) {
+    const entities = await service.findAll()
 
-    entities.forEach((entity) => {
+    const artistEntities = entities.filter((entity) => entity.artistId === id);
+
+    artistEntities.forEach((entity) => {
       if ('duration' in entity) {
         this.trackService.update(entity.id, { ...entity, artistId: null });
       } else {
