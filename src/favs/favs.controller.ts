@@ -15,43 +15,43 @@ export class FavsController {
 
   @Get()
   @Header('Content-Type', 'application/json')
-  findAllFavs() {
-    return this.favsService.findAllFavs();
+  async findAllFavs() {
+    return await this.favsService.findAllFavs();
   }
 
   @Post('/track/:id')
   @Header('Content-Type', 'application/json')
-  addTrack(@Param('id') id: string) {
-    return this.favsService.addTrack(id);
+  async addTrack(@Param('id') id: string) {
+    return await this.favsService.addTrack(id);
   }
 
   @Delete('/track/:id')
   @HttpCode(204)
-  removeTrack(@Param('id') id: string) {
-    return this.favsService.removeTrack(id);
+  async removeTrack(@Param('id') id: string): Promise<void> {
+    await this.favsService.removeTrack(id);
   }
 
   @Post('/album/:id')
   @Header('Content-Type', 'application/json')
-  addAlbum(@Param('id') id: string) {
-    return this.favsService.addAlbum(id);
+  async addAlbum(@Param('id') id: string) {
+    return await this.favsService.addAlbum(id);
   }
 
   @Delete('/album/:id')
   @HttpCode(204)
-  removeAlbum(@Param('id') id: string) {
-    return this.favsService.removeAlbum(id);
+  async removeAlbum(@Param('id') id: string): Promise<void> {
+    await this.favsService.removeAlbum(id);
   }
 
   @Post('/artist/:id')
   @Header('Content-Type', 'application/json')
-  addArtist(@Param('id') id: string) {
-    return this.favsService.addArtist(id);
+  async addArtist(@Param('id') id: string) {
+    return await this.favsService.addArtist(id);
   }
 
   @Delete('/artist/:id')
   @HttpCode(204)
-  removeArtist(@Param('id') id: string) {
-    return this.favsService.removeArtist(id);
+  async removeArtist(@Param('id') id: string): Promise<void> {
+    await this.favsService.removeArtist(id);
   }
 }
