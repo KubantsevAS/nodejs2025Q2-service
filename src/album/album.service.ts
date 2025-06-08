@@ -36,7 +36,7 @@ export class AlbumService extends AppService<Album> {
   }
 
   async remove(id: string): Promise<void> {
-    const tracks = await this.trackService.findAll()
+    const tracks = await this.trackService.findAll();
 
     const albumTracks = tracks.filter((track) => track.albumId === id);
 

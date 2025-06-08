@@ -16,4 +16,4 @@ export class UserDto implements Omit<User, 'createdAt' | 'updatedAt'> {
     this.createdAt = user.createdAt.getTime();
     this.updatedAt = user.updatedAt.getTime();
   }
-} 
+}

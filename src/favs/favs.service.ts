@@ -52,9 +52,9 @@ export class FavsService {
     }
 
     return {
-      artists: fav.artists.map(favorite => favorite.artist),
-      albums: fav.albums.map(favorite => favorite.album),
-      tracks: fav.tracks.map(favorite => favorite.track),
+      artists: fav.artists.map((favorite) => favorite.artist),
+      albums: fav.albums.map((favorite) => favorite.album),
+      tracks: fav.tracks.map((favorite) => favorite.track),
     };
   }
 
@@ -103,7 +103,9 @@ export class FavsService {
         track: { favId: fav.id, trackId: id },
       };
 
-      await this.prisma[`favTo${type.charAt(0).toUpperCase() + type.slice(1)}`].create({
+      await this.prisma[
+        `favTo${type.charAt(0).toUpperCase() + type.slice(1)}`
+      ].create({
         data: relationMap[type],
       });
 
@@ -124,8 +126,8 @@ export class FavsService {
 
     const fav = await this.prisma.fav.findFirst({
       include: {
-        [type + 's']: true
-      }
+        [type + 's']: true,
+      },
     });
 
     if (!fav) {
@@ -136,8 +138,8 @@ export class FavsService {
     const relation = await this.prisma[relationName].findFirst({
       where: {
         [`${type}Id`]: id,
-        favId: fav.id
-      }
+        favId: fav.id,
+      },
     });
 
     if (!relation && !silentMode) {
@@ -148,9 +150,9 @@ export class FavsService {
       where: {
         [`favId_${type}Id`]: {
           favId: fav.id,
-          [`${type}Id`]: id
-        }
-      }
+          [`${type}Id`]: id,
+        },
+      },
     });
   }
 

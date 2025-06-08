@@ -44,8 +44,11 @@ export class ArtistService extends AppService<Artist> {
     this.eventEmitter.emit('artist.deleted', id);
   }
 
-  private async setReferenceNull(service: TrackService | AlbumService, id: string) {
-    const entities = await service.findAll()
+  private async setReferenceNull(
+    service: TrackService | AlbumService,
+    id: string,
+  ) {
+    const entities = await service.findAll();
 
     const artistEntities = entities.filter((entity) => entity.artistId === id);
 

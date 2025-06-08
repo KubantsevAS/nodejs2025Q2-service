@@ -34,7 +34,7 @@ export class UserService extends AppService<User> {
   async findAllUsers(): Promise<UserDto[]> {
     const users = await super.findAll();
 
-    return users.map(user => this.toDto(user));
+    return users.map((user) => this.toDto(user));
   }
 
   async findUserById(id: string): Promise<UserDto> {
@@ -43,7 +43,10 @@ export class UserService extends AppService<User> {
     return this.toDto(user);
   }
 
-  async updateUserPassword(id: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
+  async updateUserPassword(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserDto> {
     const user = await this.findById(id);
 
     if (user.password !== updateUserDto.oldPassword) {
