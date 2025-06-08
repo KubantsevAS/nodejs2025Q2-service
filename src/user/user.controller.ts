@@ -25,7 +25,7 @@ export class UserController {
   @Post()
   @Header('Content-Type', 'application/json')
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
-    const user = await this.userService.create(createUserDto);
+    const user = await this.userService.createUser(createUserDto);
 
     return plainToInstance(UserResponseDto, user, {
       excludeExtraneousValues: true,
@@ -35,9 +35,9 @@ export class UserController {
   @Get()
   @Header('Content-Type', 'application/json')
   async findAll(): Promise<UserResponseDto[]> {
-    const users = await this.userService.findAll();
+    const users = await this.userService.findAllUsers();
 
-    return plainToInstance(UserResponseDto, [users], {
+    return plainToInstance(UserResponseDto, users, {
       excludeExtraneousValues: true,
     });
   }
@@ -45,7 +45,7 @@ export class UserController {
   @Get(':id')
   @Header('Content-Type', 'application/json')
   async findOne(@Param('id') id: string): Promise<UserResponseDto> {
-    const user = await this.userService.findOne(id);
+    const user = await this.userService.findUserById(id);
 
     return plainToInstance(UserResponseDto, user, {
       excludeExtraneousValues: true,

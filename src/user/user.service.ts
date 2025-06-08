@@ -3,6 +3,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from '@prisma/client';
 import { AppService } from '../app.service';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService extends AppService<User> {
@@ -14,25 +15,35 @@ export class UserService extends AppService<User> {
     return 'user';
   }
 
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  private toDto(user: User): UserDto {
+    return new UserDto(user);
+  }
+
+  async createUser(createUserDto: CreateUserDto): Promise<UserDto> {
     const userData: Omit<User, 'id'> = {
       ...createUserDto,
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    return super.create(userData);
+    const user = await super.create(userData);
+
+    return this.toDto(user);
   }
 
-  async findAll(): Promise<User[]> {
-    return await super.findAll();
+  async findAllUsers(): Promise<UserDto[]> {
+    const users = await super.findAll();
+
+    return users.map(user => this.toDto(user));
   }
 
-  async findOne(id: string): Promise<User> {
-    return super.findById(id);
+  async findUserById(id: string): Promise<UserDto> {
+    const user = await super.findById(id);
+
+    return this.toDto(user);
   }
 
-  async updateUserPassword(id: string, updateUserDto: UpdateUserDto): Promise<User> {
+  async updateUserPassword(id: string, updateUserDto: UpdateUserDto): Promise<UserDto> {
     const user = await this.findById(id);
 
     if (user.password !== updateUserDto.oldPassword) {
@@ -51,7 +62,9 @@ export class UserService extends AppService<User> {
       updatedAt: new Date(),
     };
 
-    return await this.update(id, updateData);
+    const updatedUser = await this.update(id, updateData);
+
+    return this.toDto(updatedUser);
   }
 
   async remove(id: string): Promise<void> {
