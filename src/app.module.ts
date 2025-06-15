@@ -8,6 +8,7 @@ import { TrackModule } from './track/track.module';
 import { FavsModule } from './favs/favs.module';
 import { UserModule } from './user/user.module';
 import { PrismaClient } from '@prisma/client';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -17,6 +18,7 @@ import { PrismaClient } from '@prisma/client';
     TrackModule,
     FavsModule,
     UserModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [
