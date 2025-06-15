@@ -19,6 +19,12 @@ export class UserService extends AppService<User> {
     return new UserDto(user);
   }
 
+  async findByLogin(login: string): Promise<User | null> {
+    return this.prisma.user.findFirst({
+      where: { login },
+    });
+  }
+
   async createUser(createUserDto: CreateUserDto): Promise<UserDto> {
     const userData: Omit<User, 'id'> = {
       ...createUserDto,
