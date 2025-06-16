@@ -41,9 +41,9 @@ export class AuthService {
       );
       console.log('Password valid:', isPasswordValid);
 
-    //   if (!isPasswordValid) {
-    //     throw new UnauthorizedException('Incorrect login or password');
-    //   }
+      if (!isPasswordValid) {
+        throw new UnauthorizedException('Incorrect login or password');
+      }
 
       const payload = { id: user.id, login: user.login };
       const accessToken = await this.jwtService.signAsync(payload, {
