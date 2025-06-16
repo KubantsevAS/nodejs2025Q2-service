@@ -1,8 +1,8 @@
 export interface AuthResponse {
   accessToken: string;
+  refreshToken: string;
 }
 
 export interface LoginResponse extends AuthResponse {
-  refreshToken: string;
-  id: string;
+  userId: string;
 }

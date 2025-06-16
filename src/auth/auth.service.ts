@@ -32,9 +32,8 @@ export class AuthService {
         expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME,
       });
 
-      return { accessToken, refreshToken, id: user.id };
+      return { userId: user.id, accessToken, refreshToken };
     } catch (error) {
-      console.error('Login error:', error);
       throw error;
     }
   }
@@ -47,12 +46,10 @@ export class AuthService {
         throw new ConflictException('Login already exists');
       }
 
-      const user = await this.usersService.createUser({
+      return await this.usersService.createUser({
         login: signupDto.login,
         password: signupDto.password,
       });
-
-      return { id: user.id };
     } catch (error) {
       console.error('Signup error:', error);
       throw error;
@@ -69,14 +66,19 @@ export class AuthService {
       );
 
       const user = await this.usersService.findById(payload.id);
+
       if (!user) {
         throw new UnauthorizedException('User not found');
       }
 
       const newPayload = { id: user.id, login: user.login };
       const accessToken = await this.jwtService.signAsync(newPayload);
+      const refreshToken = await this.jwtService.signAsync(newPayload, {
+        secret: process.env.JWT_REFRESH_SECRET_KEY,
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME,
+      });
 
-      return { accessToken };
+      return { accessToken, refreshToken };
     } catch (error) {
       throw new UnauthorizedException('Invalid refresh token');
     }
