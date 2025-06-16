@@ -27,7 +27,7 @@ export class UserController {
   async create(@Body() createUserDto: CreateUserDto): Promise<UserResponseDto> {
     const user = await this.userService.createUser(createUserDto);
 
-    return plainToInstance(UserResponseDto, user, {
+    return plainToInstance(UserResponseDto, this.userService.toDto(user), {
       excludeExtraneousValues: true,
     });
   }
@@ -47,7 +47,7 @@ export class UserController {
   async findOne(@Param('id') id: string): Promise<UserResponseDto> {
     const user = await this.userService.findUserById(id);
 
-    return plainToInstance(UserResponseDto, user, {
+    return plainToInstance(UserResponseDto, this.userService.toDto(user), {
       excludeExtraneousValues: true,
     });
   }
