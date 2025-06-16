@@ -15,20 +15,25 @@ export class UserService extends AppService<User> {
     return 'user';
   }
 
-  private toDto(user: User): UserDto {
+  toDto(user: User): UserDto {
     return new UserDto(user);
   }
 
-  async createUser(createUserDto: CreateUserDto): Promise<UserDto> {
+  async findByLogin(login: string): Promise<User | null> {
+    return this.prisma.user.findFirst({
+      where: { login },
+    });
+  }
+
+  async createUser(createUserDto: CreateUserDto): Promise<User> {
     const userData: Omit<User, 'id'> = {
       ...createUserDto,
       version: 1,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
-    const user = await super.create(userData);
 
-    return this.toDto(user);
+    return super.create(userData);
   }
 
   async findAllUsers(): Promise<UserDto[]> {
@@ -37,10 +42,10 @@ export class UserService extends AppService<User> {
     return users.map((user) => this.toDto(user));
   }
 
-  async findUserById(id: string): Promise<UserDto> {
+  async findUserById(id: string): Promise<User> {
     const user = await super.findById(id);
 
-    return this.toDto(user);
+    return user;
   }
 
   async updateUserPassword(

@@ -5,6 +5,7 @@
 Home Library Service is a RESTful API built with NestJS that provides a comprehensive solution for managing a personal music collection. The service allows users to organize and manage their Artists, Albums, and Tracks, with the ability to create custom favorites lists.
 
 ### Key Features
+
 - 🎵 Complete music collection management (Artists, Albums, Tracks)
 - ⭐ Favorites system for personal collections
 - 📚 PostgreSQL database with Prisma ORM
@@ -14,6 +15,7 @@ Home Library Service is a RESTful API built with NestJS that provides a comprehe
 - 🔒 Input validation and error handling
 
 ### Tech Stack
+
 - **Backend**: NestJS v10.4
 - **Database**: PostgreSQL with Prisma ORM
 - **Containerization**: Docker & Docker Compose
@@ -21,7 +23,8 @@ Home Library Service is a RESTful API built with NestJS that provides a comprehe
 - **Testing**: Jest
 - **Node.js**: v22.14.0+
 
-### Quick Start
+### Quick Start with docker
+
 ```bash
 # Clone the repository
 git clone https://github.com/KubantsevAS/nodejs2025Q2-service.git
@@ -38,34 +41,41 @@ The service will be available at `http://localhost:4000` with API documentation 
 
 ## Table of Contents
 
-- [Description](#description)
-- [Features](#features)
-- [Prerequisites](#prerequisites)
-- [Quick Start](#quick-start)
-  - [Using Docker (Recommended)](#using-docker-recommended)
-  - [Manual Installation](#manual-installation)
-- [Docker Commands](#docker-commands)
-  - [Basic Commands](#basic-commands)
-  - [Development Commands](#development-commands)
-- [Database Management](#database-management)
-  - [Accessing the Database](#accessing-the-database)
-  - [Database Structure](#database-structure)
-- [API Documentation](#api-documentation)
-  - [Available Endpoints](#available-endpoints)
-    - [Users](#users)
-    - [Artists](#artists)
-    - [Albums](#albums)
-    - [Tracks](#tracks)
-    - [Favorites](#favorites)
-- [Development](#development)
-  - [Testing](#testing)
-  - [Code Quality](#code-quality)
-  - [Debugging](#debugging)
-- [Project Structure](#project-structure)
-- [Troubleshooting](#troubleshooting)
-  - [Common Issues](#common-issues)
-- [Production Deployment](#production-deployment)
-- [License](#license)
+- [Home Library Service](#home-library-service)
+  - [Summary](#summary)
+    - [Key Features](#key-features)
+    - [Tech Stack](#tech-stack)
+    - [Quick Start with docker](#quick-start-with-docker)
+  - [Table of Contents](#table-of-contents)
+  - [Description](#description)
+  - [Features](#features)
+  - [Prerequisites](#prerequisites)
+  - [Quick Start](#quick-start)
+    - [Using Docker (Recommended)](#using-docker-recommended)
+    - [Docker Hub Image](#docker-hub-image)
+    - [Manual Installation](#manual-installation)
+  - [Docker Commands](#docker-commands)
+    - [Basic Commands](#basic-commands)
+    - [Development Commands](#development-commands)
+  - [Database Management](#database-management)
+    - [Accessing the Database](#accessing-the-database)
+    - [Database Structure](#database-structure)
+  - [API Documentation](#api-documentation)
+    - [Available Endpoints](#available-endpoints)
+      - [Users](#users)
+      - [Artists](#artists)
+      - [Albums](#albums)
+      - [Tracks](#tracks)
+      - [Favorites](#favorites)
+  - [Development](#development)
+    - [Testing](#testing)
+    - [Code Quality](#code-quality)
+    - [Debugging](#debugging)
+  - [Project Structure](#project-structure)
+  - [Troubleshooting](#troubleshooting)
+    - [Common Issues](#common-issues)
+  - [Production Deployment](#production-deployment)
+  - [License](#license)
 
 ## Description
 
@@ -96,40 +106,44 @@ A Home Library Service built with NestJS that allows users to manage their music
 ### Using Docker (Recommended)
 
 1. Clone the repository:
-```bash
-git clone https://github.com/KubantsevAS/nodejs2025Q2-service.git
-cd nodejs2025Q2-service
-```
+
+    ```bash
+    git clone https://github.com/KubantsevAS/nodejs2025Q2-service.git
+    cd nodejs2025Q2-service
+    ```
 
 2. Set up environment variables:
-```bash
-# Copy the example environment file
-cp .env.example .env
 
-# Edit .env with your actual values
-nano .env  # or use your preferred text editor
-```
+    ```bash
+    # Copy the example environment file
+    cp .env.example .env
+    
+    # Edit .env with your actual values
+    nano .env  # or use your preferred text editor
+    ```
 
-The `.env` file should contain the following variables (example values shown):
-```env
-# Application
-PORT=4000
-NODE_ENV=development
+    The `.env` file should contain the following variables (example values shown):
 
-# Database
-POSTGRES_USER=your_username
-POSTGRES_PASSWORD=your_password
-POSTGRES_DB=your_database
-POSTGRES_PORT=5432
-POSTGRES_HOST=db
+    ```env
+    # Application
+    PORT=4000
+    NODE_ENV=development
 
-# Database URL
-DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
-```
+    # Database
+    POSTGRES_USER=your_username
+    POSTGRES_PASSWORD=your_password
+    POSTGRES_DB=your_database
+    POSTGRES_PORT=5432
+    POSTGRES_HOST=db
 
-Make sure to replace the example values with your actual configuration.
+    # Database URL
+    DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}
+    ```
+
+    Make sure to replace the example values with your actual configuration.
 
 3. Start the application:
+
 ```bash
 # Development mode
 docker-compose up
@@ -149,6 +163,7 @@ docker pull henry173/nodejs2025q2-service-web:latest
 ```
 
 Or use it in your docker-compose.yml:
+
 ```yaml
 services:
   app:
@@ -162,31 +177,35 @@ services:
 ### Manual Installation
 
 1. Clone the repository:
-```bash
-git clone https://github.com/KubantsevAS/nodejs2025Q2-service.git
-cd nodejs2025Q2-service
-```
+
+    ```bash
+    git clone https://github.com/KubantsevAS/nodejs2025Q2-service.git
+    cd nodejs2025Q2-service
+    ```
 
 2. Install dependencies:
-```bash
-npm install
-```
+
+    ```bash
+    npm install
+    ```
 
 3. Create `.env` file (see above)
 
 4. Start the application:
-```bash
-# Development mode
-npm run start:dev
 
-# Production mode
-npm run build
-npm run start:prod
-```
+    ```bash
+    # Development mode
+    npm run start:dev
+
+    # Production mode
+    npm run build
+    npm run start:prod
+    ```
 
 ## Docker Commands
 
 ### Basic Commands
+
 ```bash
 # Build image
 docker build -t home-library .
@@ -205,6 +224,7 @@ docker-compose down -v
 ```
 
 ### Development Commands
+
 ```bash
 # Start in development mode
 docker-compose up --build
@@ -219,6 +239,7 @@ docker-compose logs -f
 ## Database Management
 
 ### Accessing the Database
+
 ```bash
 # Connect to database
 docker-compose exec db psql -U postgres
@@ -228,6 +249,7 @@ docker-compose exec db pg_isready -U postgres
 ```
 
 ### Database Structure
+
 - PostgreSQL 14
 - Prisma ORM for database operations
 - Data persisted in Docker volume
@@ -242,12 +264,14 @@ Access the OpenAPI documentation at: `http://localhost:4000/doc/`
 ### Available Endpoints
 
 #### Users
+
 - `GET /user` - Get all users
 - `GET /user/:id` - Get user by ID
 - `PUT /user/:id` - Update user
 - `DELETE /user/:id` - Delete user
 
 #### Artists
+
 - `GET /artist` - Get all artists
 - `GET /artist/:id` - Get artist by ID
 - `POST /artist` - Create new artist
@@ -255,6 +279,7 @@ Access the OpenAPI documentation at: `http://localhost:4000/doc/`
 - `DELETE /artist/:id` - Delete artist
 
 #### Albums
+
 - `GET /album` - Get all albums
 - `GET /album/:id` - Get album by ID
 - `POST /album` - Create new album
@@ -262,6 +287,7 @@ Access the OpenAPI documentation at: `http://localhost:4000/doc/`
 - `DELETE /album/:id` - Delete album
 
 #### Tracks
+
 - `GET /track` - Get all tracks
 - `GET /track/:id` - Get track by ID
 - `POST /track` - Create new track
@@ -269,6 +295,7 @@ Access the OpenAPI documentation at: `http://localhost:4000/doc/`
 - `DELETE /track/:id` - Delete track
 
 #### Favorites
+
 - `GET /favs` - Get all favorites
 - `POST /favs/track/:id` - Add track to favorites
 - `POST /favs/album/:id` - Add album to favorites
@@ -280,6 +307,7 @@ Access the OpenAPI documentation at: `http://localhost:4000/doc/`
 ## Development
 
 ### Testing
+
 ```bash
 # Run all tests
 npm run test
@@ -289,6 +317,7 @@ npm run test -- <path-to-suite>
 ```
 
 ### Code Quality
+
 ```bash
 # Linting
 npm run lint
@@ -304,6 +333,7 @@ npm run security:audit:fix
 ```
 
 ### Debugging
+
 - Press `F5` in VSCode to start debugging
 - For more information: [VSCode Debugging](https://code.visualstudio.com/docs/editor/debugging)
 
@@ -335,31 +365,34 @@ test/
 ### Common Issues
 
 1. **Database Connection Issues**
-```bash
-# Check database logs
-docker-compose logs db
 
-# Check application logs
-docker-compose logs web
-```
+    ```bash
+    # Check database logs
+    docker-compose logs db
+
+    # Check application logs
+    docker-compose logs web
+    ```
 
 2. **Container Issues**
-```bash
-# Check container status
-docker-compose ps
 
-# Restart containers
-docker-compose restart
-```
+    ```bash
+    # Check container status
+    docker-compose ps
+
+    # Restart containers
+    docker-compose restart
+    ```
 
 3. **Reset Everything**
-```bash
-# Stop and remove everything
-docker-compose down -v
 
-# Rebuild and start
-docker-compose up --build
-```
+    ```bash
+    # Stop and remove everything
+    docker-compose down -v
+
+    # Rebuild and start
+    docker-compose up --build
+    ```
 
 ## Production Deployment
 
@@ -372,6 +405,7 @@ For production deployment:
 5. Set up monitoring
 
 Example production deployment:
+
 ```bash
 # Build production image
 docker build -t home-library:prod .
