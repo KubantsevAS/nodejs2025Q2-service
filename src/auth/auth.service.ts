@@ -8,7 +8,8 @@ import { UserService } from 'src/user/user.service';
 import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { RefreshDto } from './dto/refresh.dto';
-import { AuthResponse, LoginResponse } from './types/auth.types';
+import { AuthResponse } from './types/auth.types';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -17,22 +18,36 @@ export class AuthService {
     private jwtService: JwtService,
   ) {}
 
-  async signIn(loginDto: LoginDto): Promise<LoginResponse> {
+  async signIn(
+    loginDto: LoginDto,
+  ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
       const user = await this.usersService.findByLogin(loginDto.login);
 
-      if (!user || user.password !== loginDto.password) {
+      if (!user) {
+        throw new UnauthorizedException('Incorrect login or password');
+      }
+
+      const isPasswordValid = await bcrypt.compare(
+        loginDto.password,
+        user.password,
+      );
+
+      if (!isPasswordValid) {
         throw new UnauthorizedException('Incorrect login or password');
       }
 
       const payload = { id: user.id, login: user.login };
-      const accessToken = await this.jwtService.signAsync(payload);
+      const accessToken = await this.jwtService.signAsync(payload, {
+        secret: process.env.JWT_SECRET_KEY,
+        expiresIn: process.env.TOKEN_EXPIRE_TIME,
+      });
       const refreshToken = await this.jwtService.signAsync(payload, {
         secret: process.env.JWT_REFRESH_SECRET_KEY,
         expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME,
       });
 
-      return { userId: user.id, accessToken, refreshToken };
+      return { accessToken, refreshToken };
     } catch (error) {
       throw error;
     }
@@ -46,10 +61,15 @@ export class AuthService {
         throw new ConflictException('Login already exists');
       }
 
-      return await this.usersService.createUser({
+      const saltRounds = parseInt(process.env.CRYPT_SALT || '10', 10);
+      const hashedPassword = await bcrypt.hash(signupDto.password, saltRounds);
+
+      const user = await this.usersService.createUser({
         login: signupDto.login,
-        password: signupDto.password,
+        password: hashedPassword,
       });
+
+      return { id: user.id };
     } catch (error) {
       console.error('Signup error:', error);
       throw error;
@@ -65,7 +85,7 @@ export class AuthService {
         },
       );
 
-      const user = await this.usersService.findById(payload.id);
+      const user = await this.usersService.findUserById(payload.id);
 
       if (!user) {
         throw new UnauthorizedException('User not found');

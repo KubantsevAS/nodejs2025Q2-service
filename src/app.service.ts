@@ -43,14 +43,13 @@ export class AppService<T> {
   }
 
   async create(data: Omit<T, 'id'>): Promise<T> {
-    const entity = {
-      id: uuidV4(),
-      ...data,
-    };
-
     const modelName = this.getModelName();
+
     return this.prisma[modelName].create({
-      data: entity,
+      data: {
+        id: uuidV4(),
+        ...data,
+      },
     }) as Promise<T>;
   }
 

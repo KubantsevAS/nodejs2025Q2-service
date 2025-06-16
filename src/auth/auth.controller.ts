@@ -4,7 +4,7 @@ import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { Public } from './public.decorator';
-import { AuthResponse, LoginResponse } from './types/auth.types';
+import { AuthResponse } from './types/auth.types';
 
 @Controller('auth')
 export class AuthController {
@@ -13,15 +13,15 @@ export class AuthController {
   @Public()
   @Post('login')
   @HttpCode(HttpStatus.OK)
-  async login(@Body() loginDto: LoginDto): Promise<LoginResponse> {
-    return this.authService.signIn(loginDto);
+  async login(@Body() loginDto: LoginDto): Promise<AuthResponse> {
+    return await this.authService.signIn(loginDto);
   }
 
   @Public()
   @Post('signup')
   @HttpCode(HttpStatus.CREATED)
   async signup(@Body() signupDto: SignupDto): Promise<{ id: string }> {
-    return this.authService.signUp(signupDto);
+    return await this.authService.signUp(signupDto);
   }
 
   @Post('refresh')
