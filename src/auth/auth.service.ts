@@ -2,6 +2,7 @@ import {
   Injectable,
   UnauthorizedException,
   ConflictException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UserService } from 'src/user/user.service';
@@ -9,39 +10,42 @@ import { LoginDto } from './dto/login.dto';
 import { SignupDto } from './dto/signup.dto';
 import { RefreshDto } from './dto/refresh.dto';
 import { AuthResponse } from './types/auth.types';
+import { LoggerService } from '../logger/logger.service';
 import * as bcrypt from 'bcrypt';
+import { UserResponseDto } from 'src/user/dto/user-response.dto';
 
 @Injectable()
 export class AuthService {
   constructor(
     private usersService: UserService,
     private jwtService: JwtService,
+    private logger: LoggerService,
   ) {}
 
-  async signIn(
+  async login(
     loginDto: LoginDto,
   ): Promise<{ accessToken: string; refreshToken: string }> {
     try {
-      console.log('Attempting to sign in with login:', loginDto.login);
-      console.log('Attempting to sign in with password:', loginDto.password);
+      this.logger.log('Login attempt', { login: loginDto.login });
 
       const user = await this.usersService.findByLogin(loginDto.login);
-      console.log('Found user:', user ? 'yes' : 'no');
-      console.log('Found user login:', user.login);
-      console.log('Found user password:', user.password);
 
       if (!user) {
+        this.logger.warn('Login failed: User not found', {
+          login: loginDto.login,
+        });
         throw new UnauthorizedException('Incorrect login or password');
       }
 
-      console.log('Comparing passwords...');
       const isPasswordValid = await bcrypt.compare(
         loginDto.password,
         user.password,
       );
-      console.log('Password valid:', isPasswordValid);
 
       if (!isPasswordValid) {
+        this.logger.warn('Login failed: Invalid password', {
+          login: loginDto.login,
+        });
         throw new UnauthorizedException('Incorrect login or password');
       }
 
@@ -55,45 +59,59 @@ export class AuthService {
         expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME,
       });
 
+      this.logger.log('Login successful', { userId: user.id });
+
       return { accessToken, refreshToken };
     } catch (error) {
-      console.error('SignIn error:', error);
-      throw error;
+      this.logger.error('Login error', { error: error.message });
+
+      if (error instanceof UnauthorizedException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('An error occurred during login');
     }
   }
 
-  async signUp(signupDto: SignupDto): Promise<{ id: string }> {
+  async signUp(signupDto: SignupDto): Promise<UserResponseDto> {
     try {
-      console.log('Attempting to sign up with login:', signupDto.login);
+      this.logger.log('Signup attempt', { login: signupDto.login });
 
       const existingUser = await this.usersService.findByLogin(signupDto.login);
-      console.log('Existing user found:', existingUser ? 'yes' : 'no');
 
       if (existingUser) {
+        this.logger.warn('Signup failed: Login already exists', {
+          login: signupDto.login,
+        });
         throw new ConflictException('Login already exists');
       }
 
       const saltRounds = parseInt(process.env.CRYPT_SALT || '10', 10);
-      console.log('Using salt rounds:', saltRounds);
-
       const hashedPassword = await bcrypt.hash(signupDto.password, saltRounds);
-      console.log('Password hashed successfully');
 
       const user = await this.usersService.createUser({
         login: signupDto.login,
         password: hashedPassword,
       });
-      console.log('User created with ID:', user.id);
 
-      return { id: user.id };
+      this.logger.log('Signup successful', { userId: user.id });
+
+      return this.usersService.toDto(user);
     } catch (error) {
-      console.error('Signup error:', error);
-      throw error;
+      this.logger.error('Signup error', { error: error.message });
+
+      if (error instanceof ConflictException) {
+        throw error;
+      }
+
+      throw new InternalServerErrorException('An error occurred during signup');
     }
   }
 
   async refresh(refreshDto: RefreshDto): Promise<AuthResponse> {
     try {
+      this.logger.log('Token refresh attempt');
+
       const payload = await this.jwtService.verifyAsync(
         refreshDto.refreshToken,
         {
@@ -104,6 +122,9 @@ export class AuthService {
       const user = await this.usersService.findUserById(payload.id);
 
       if (!user) {
+        this.logger.warn('Token refresh failed: User not found', {
+          userId: payload.id,
+        });
         throw new UnauthorizedException('User not found');
       }
 
@@ -117,8 +138,10 @@ export class AuthService {
         expiresIn: process.env.REFRESH_TOKEN_EXPIRE_TIME,
       });
 
+      this.logger.log('Token refresh successful', { userId: user.id });
       return { accessToken, refreshToken };
     } catch (error) {
+      this.logger.error('Token refresh error', { error: error.message });
       throw new UnauthorizedException('Invalid refresh token');
     }
   }

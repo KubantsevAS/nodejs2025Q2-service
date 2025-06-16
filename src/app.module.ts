@@ -11,6 +11,8 @@ import { UserModule } from './user/user.module';
 import { PrismaClient } from '@prisma/client';
 import { AuthModule } from './auth/auth.module';
 import { AuthGuard } from './auth/auth.guard';
+import { LoggerModule } from './logger/logger.module';
+import { FiltersModule } from './filters/filters.module';
 
 @Module({
   imports: [
@@ -21,6 +23,8 @@ import { AuthGuard } from './auth/auth.guard';
     FavsModule,
     UserModule,
     AuthModule,
+    LoggerModule,
+    FiltersModule,
   ],
   controllers: [AppController],
   providers: [
