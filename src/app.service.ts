@@ -1,53 +1,77 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  NotFoundException,
+  Injectable,
+} from '@nestjs/common';
 import { v4 as uuidV4, validate as isUuid } from 'uuid';
-import { Injectable } from '@nestjs/common';
+import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class AppService<T extends { id: string }> {
-  protected entities: T[] = [];
+export class AppService<T> {
+  protected prisma: PrismaClient;
 
-  create(entityDto: T) {
-    const entity = {
-      id: uuidV4(),
-      ...entityDto,
-    };
-
-    this.entities.push(entity);
-
-    return entity;
+  constructor() {
+    this.prisma = new PrismaClient();
   }
 
-  findAll(): T[] {
-    return this.entities;
+  protected getModelName(): string {
+    throw new Error('getModelName must be implemented by child class');
   }
 
-  findById(id: string): T {
+  async findAll(): Promise<T[]> {
+    const modelName = this.getModelName();
+    const result = await this.prisma[modelName].findMany();
+
+    return result as T[];
+  }
+
+  async findById(id: string): Promise<T> {
     if (!isUuid(id)) {
       throw new BadRequestException('Record Id is invalid (not uuid)');
     }
 
-    const entity = this.entities.find((entity) => entity.id === id);
+    const modelName = this.getModelName();
+    const entity = await this.prisma[modelName].findUnique({
+      where: { id },
+    });
 
     if (!entity) {
       throw new NotFoundException(`Record with id === ${id} doesn't exist`);
     }
 
-    return entity;
+    return entity as T;
   }
 
-  update(id: string, entityDto: Omit<T, 'id'>): T {
-    const entity = this.findById(id);
+  async create(data: Omit<T, 'id'>): Promise<T> {
+    const entity = {
+      id: uuidV4(),
+      ...data,
+    };
 
-    for (const key in entityDto) {
-      entity[key] = entityDto[key];
-    }
-
-    return entity;
+    const modelName = this.getModelName();
+    return this.prisma[modelName].create({
+      data: entity,
+    }) as Promise<T>;
   }
 
-  remove(id: string): void {
-    const entity = this.findById(id);
+  async update(id: string, data: Partial<T>): Promise<T> {
+    await this.findById(id);
 
-    this.entities.splice(this.entities.indexOf(entity), 1);
+    const modelName = this.getModelName();
+
+    return this.prisma[modelName].update({
+      where: { id },
+      data,
+    }) as Promise<T>;
+  }
+
+  async remove(id: string): Promise<void> {
+    await this.findById(id);
+
+    const modelName = this.getModelName();
+
+    await this.prisma[modelName].delete({
+      where: { id },
+    });
   }
 }

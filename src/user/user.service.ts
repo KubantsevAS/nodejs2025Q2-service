@@ -1,8 +1,9 @@
 import { ForbiddenException, Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './entities/user.entity';
+import { User } from '@prisma/client';
 import { AppService } from '../app.service';
+import { UserDto } from './dto/user.dto';
 
 @Injectable()
 export class UserService extends AppService<User> {
@@ -10,25 +11,43 @@ export class UserService extends AppService<User> {
     super();
   }
 
-  create(createUserDto: CreateUserDto): User {
-    return super.create({
+  protected getModelName(): string {
+    return 'user';
+  }
+
+  private toDto(user: User): UserDto {
+    return new UserDto(user);
+  }
+
+  async createUser(createUserDto: CreateUserDto): Promise<UserDto> {
+    const userData: Omit<User, 'id'> = {
       ...createUserDto,
       version: 1,
-      createdAt: Date.now(),
-      updatedAt: Date.now(),
-    } as User);
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+    const user = await super.create(userData);
+
+    return this.toDto(user);
   }
 
-  findAll(): User[] {
-    return super.findAll();
+  async findAllUsers(): Promise<UserDto[]> {
+    const users = await super.findAll();
+
+    return users.map((user) => this.toDto(user));
   }
 
-  findOne(id: string): User {
-    return super.findById(id);
+  async findUserById(id: string): Promise<UserDto> {
+    const user = await super.findById(id);
+
+    return this.toDto(user);
   }
 
-  updateUserPassword(id: string, updateUserDto: UpdateUserDto): User {
-    const user = super.findById(id);
+  async updateUserPassword(
+    id: string,
+    updateUserDto: UpdateUserDto,
+  ): Promise<UserDto> {
+    const user = await this.findById(id);
 
     if (user.password !== updateUserDto.oldPassword) {
       throw new ForbiddenException('Old password is wrong');
@@ -40,15 +59,18 @@ export class UserService extends AppService<User> {
       );
     }
 
-    return super.update(id, {
-      ...user,
+    const updateData: Partial<User> = {
       password: updateUserDto.newPassword,
       version: user.version + 1,
-      updatedAt: Date.now(),
-    } as Omit<User, 'id'>);
+      updatedAt: new Date(),
+    };
+
+    const updatedUser = await this.update(id, updateData);
+
+    return this.toDto(updatedUser);
   }
 
-  remove(id: string): void {
-    super.remove(id);
+  async remove(id: string): Promise<void> {
+    await super.remove(id);
   }
 }

@@ -1,34 +1,36 @@
 import { Injectable } from '@nestjs/common';
+import { Track } from '@prisma/client';
 import { AppService } from '../app.service';
-import { Track } from './entities/track.entity';
 import { CreateTrackDto } from './dto/create-track.dto';
 import { UpdateTrackDto } from './dto/update-track.dto';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class TrackService extends AppService<Track> {
-  constructor(private eventEmitter: EventEmitter2) {
+  constructor() {
     super();
   }
 
-  create(createTrackDto: CreateTrackDto): Track {
-    return super.create(createTrackDto as Track);
+  protected getModelName(): string {
+    return 'track';
   }
 
-  findAll(): Track[] {
+  async create(createTrackDto: CreateTrackDto): Promise<Track> {
+    return await super.create(createTrackDto as Track);
+  }
+
+  async findAll(): Promise<Track[]> {
     return super.findAll();
   }
 
-  findOne(id: string): Track {
-    return super.findById(id);
+  async findOne(id: string): Promise<Track> {
+    return await super.findById(id);
   }
 
-  update(id: string, updateTrackDto: UpdateTrackDto): Track {
-    return super.update(id, updateTrackDto);
+  async update(id: string, updateTrackDto: UpdateTrackDto): Promise<Track> {
+    return await super.update(id, updateTrackDto as Omit<Track, 'id'>);
   }
 
-  remove(id: string): void {
-    super.remove(id);
-    this.eventEmitter.emit('track.deleted', id);
+  async remove(id: string): Promise<void> {
+    await super.remove(id);
   }
 }
